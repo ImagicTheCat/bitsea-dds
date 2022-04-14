@@ -9,7 +9,7 @@ Each _user_ has a _shore_ where its data is stranded and by the use of a _seapor
 
 With more technical words, a user is a *node*, the shore is its *storage*, the seaport is the *client* program and the seaways are *exchange protocols*. The way data is exchanged may be implemented in multiple ways, e.g. being part of a P2P mesh network or requesting an HTTP gateway (through https://en.wikipedia.org/wiki/Tor_(network)[Tor] if anonymity is necessary) which would be connected to a mesh network; the data could even be manually imported from physical storage.
 
-== Data
+== Data objects
 
 .There are two types of data objects:
 Data block:: A content-addressed piece of data, i.e. by a cryptographic hash, which has a reasonable maximum size like 256kiB.
@@ -41,19 +41,21 @@ The version of the contents is inferred from the version of the identity identif
 
 An unbound pointer is accessed by its identity identifier. A bound pointer is accessed by its identity identifier and its bound data block identifier. A topic is accessed by a data block identifier and results in the aggregation or listing of the associated bound pointers.
 
-=== Structures
+== Data structures
 
-==== Directory
+=== Directory
 
-==== File
+=== File
 
-== Location
+== Access
 
 === Data block
 
 === Pointer
 
 === Alias
+
+=== Directory
 
 == Limitations
 
