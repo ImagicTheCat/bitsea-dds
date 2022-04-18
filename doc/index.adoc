@@ -1,4 +1,4 @@
-= BitSea Protocol
+= BitSea Distributed Data System
 :toc: left
 
 This protocol aims to implement immutable, mutable and discoverable distributed content. It can result in a robust, offline, long-term, independent access to structured data.
