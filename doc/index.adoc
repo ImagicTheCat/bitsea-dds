@@ -27,6 +27,8 @@ TIP: The way data is exchanged may be implemented in multiple ways, e.g. being p
 - Temporary or transport-based data, e.g. emails.
 - Replacing the Web. BitSea may be a component of the distributed web, but it doesn't aim to *be* the distributed web.
 
+NOTE: The system specification *must* be backwards compatible.
+
 == Data objects
 
 .There are two types of data objects:
@@ -98,6 +100,48 @@ A data structure is built on blocks; generally, this will result in a Merkle DAG
 === Directory
 
 == Uniform Resource Identifier
+
+A resource of the system is equivalent to a specific block, which can describe a data structure or may be interpreted as a topic.
+
+A BitSea URI follows the https://datatracker.ietf.org/doc/html/rfc3986[generic URI specification] and uses the `bitsea` scheme.
+
+Each step of the URI path resolves to a resource, i.e. a block.
+
+.EBNF-like partial specification
+----
+scheme = "bitsea"
+root-segment = block | pointer | bound-pointer | alias
+block = <base128btc encoding of the block identifier>
+identity = <base128btc encoding of the identity identifier>
+pointer = identity
+bound-pointer = identity "." block
+----
+
+The `base128btc` alphabet is specifically `123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`.
+
+NOTE: The incentives for `base128btc` encoding is human-readability and composition: short strings, less ambiguity, no special characters.
+
+A `pointer` or `bound-pointer` resolves to the pointed resource.
+
+The `alias` is an URI root segment which doesn't match the previously defined root segments. It resolves to a locally named resource.
+
+NOTE: A _seaport_ can provide pre-defined aliases and should allow the user to define more.
+
+.Examples
+block:: `bitsea:1CMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
+pointer:: `bitsea:fJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P/...`
+bound pointer:: `bitsea:fJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P.1CMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
+alias and directory fetch:: `bitsea:org/wikipedia/...`
+
+=== Data structures
+
+==== Directory
+
+A path segment from a directory resolves to the resource (block or pointers) assigned to that specific entry. The segment bytes are used as the key.
+
+==== Key-value store
+
+The URI fragment can be used to reference an entry of the key-value store.
 
 == Limitations
 
