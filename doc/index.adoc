@@ -7,53 +7,89 @@ It can result in a robust, offline, long-term, independent access to structured 
 
 == Principles
 
-The system is fundamentally about data; the way data is exchanged is independent of the specification. However, because actual implementations are built on it, they are still taken into consideration for its design.
+The system is fundamentally about data and its semantic; the way data is exchanged is independent of the specification. However, because actual implementations should exist, the system is designed with concerns about how it will be implemented.
 
 The concept is as follows: each _user_ has a _shore_ where its data of interest is stranded; then by the use of a _seaport_ that data can be exchanged with other shores across the sea through _seaways_.
 
 With more technical words, a user is a *node*, the shore is its *storage*, the seaport is the *client application* and the seaways are *exchange protocols*.
 
-NOTE: The way data is exchanged may be implemented in multiple ways, e.g. being part of a P2P mesh network or requesting an HTTP gateway (through https://en.wikipedia.org/wiki/Tor_(network)[Tor] if anonymity is necessary) which would be connected to a mesh network; the data could even be manually imported from physical storage.
+TIP: The way data is exchanged may be implemented in multiple ways, e.g. being part of a P2P mesh network or requesting an HTTP gateway (through https://en.wikipedia.org/wiki/Tor_(network)[Tor] if anonymity is necessary) which would be connected to a mesh network; the data could even be manually imported from physical storage.
 
-Fast, reactive, very dynamic data, i.e. chatting or live streaming, is not a goal for the system; properties like verifiability, resilience and persistence of data are more valuable.
+.What the system is about
+- Sharing. Distributed applications.
+- Focused on data, independent of a specific exchange protocol; being offline.
+- Data verifiability, resilience, persistence, durability.
+- A balance between simplicity and flexibility.
+
+.What the system is not about
+- Confidentiality. The system is not about storing private data footnote:[But exchange protocols may guarantee that a specific resource, a block, pointer or topic, can only be discovered by knowing its identifier first.].
+- Fast, reactive, very dynamic data, e.g. chatting or live streaming.
+- Temporary or transport-based data, e.g. emails.
+- Replacing the Web. BitSea may be a component of the distributed web, but it doesn't aim to *be* the distributed web.
 
 == Data objects
 
 .There are two types of data objects:
-Data block:: A content-addressed piece of data, i.e. by a cryptographic hash, which has a reasonable size like 256kiB.
-Pointers:: A reference to a data block, signed with a timestamp by an identity. The pointer can be unbound or bound to a specific data block.
+Block:: A content-addressed piece of data, i.e. by a cryptographic hash, which has a reasonable size like 256kiB.
+Pointers:: A mutable reference to a block, signed with a timestamp by an identity. The pointer can be unbound or bound to a specific block.
 
 .This results in two more concepts:
 Identity:: A public key owned by an entity.
-Topic:: A data block identifier which may have bound pointers.
+Topic:: A block identifier which may have bound pointers.
 
-Data blocks are immutable content, pointers are a layer for mutable content and topics are a way to discover content via bound pointers.
+Blocks define immutable content, pointers are a layer above to implement mutable content and topics are a way to discover content via bound pointers.
 
-A data block may contain anything, e.g. references to other data blocks to build a https://en.wikipedia.org/wiki/Merkle_tree[Merkle] DAG (Directed Acyclic Graph).
+A block may contain anything, e.g. references to other blocks to build a https://en.wikipedia.org/wiki/Merkle_tree[Merkle] DAG (Directed Acyclic Graph).
 
-NOTE: Complex data can be built on data blocks and the system defines some of them, but it is possible to create other kind of structures and _seaports_ may be able to interpret them.
+TIP: Complex data structures can be built on blocks and the system defines some. It is possible to create new kind of structures; _seaports_ or other applications may interpret them.
 
-=== Data block
+=== Block
 
-The accepted size of a data block is enforced by the _seaport_ and _seaways_ implementations, but a size between 0 and 512kiB while aiming towards 256kiB is recommended. This is based on current P2P sharing system policies and the required flexibility for techniques like Content-Defined Chunking.
+The accepted size of a block is enforced by the _seaport_ and _seaways_ implementations, but a size between 0 and 512kiB while aiming towards 256kiB is recommended. This is based on current P2P sharing system policies and the required flexibility for techniques like Content-Defined Chunking.
 
-A data block identifier (version 1) is `<prefix><hash>`, where `prefix` is a byte (`0x00`) and `hash` is a https://en.wikipedia.org/wiki/BLAKE_(hash_function)[blake2s-256] hash of the content (32 bytes).
+.EBNF-like specification
+----
+block-identifier-v1 = 0x00 hash
+hash = <blake2s-256 hash of the content, 32 bytes>
+
+block-content = type-header content-data
+type-header = size {byte}
+size = <8 bit unsigned integer, 0-255, 1 byte>
+content-data = {byte}
+----
+
+A block identifier (version 1) is a sequence of 33 bytes. The content `hash` is computed using https://en.wikipedia.org/wiki/BLAKE_(hash_function)[blake2s-256].
+
+A block content start with a `type-header`, a byte sequence between 0 and 255 bytes which defines its data type. An empty `type-header` of `size` 0 is a raw data block. The `type-header` can be used by anyone to build new data structures or formats from blocks.
 
 === Pointers
 
-An identity identifier (version 1) is `<prefix><public-key>`, where `prefix` is a byte (`0x80`) and `public-key` is an https://en.wikipedia.org/wiki/EdDSA[Ed25519] public key.
+.EBNF-like specification
+----
+identity-identifier-v1 = 0x80 public-key
+public-key = <Ed25519 public key, 32 bytes>
 
-The content (version 1) of an unbound pointer object is `<timestamp><data-identifier><signature>` where `timestamp` is a 64bit unsigned integer (8 bytes, little-endian) which should be set at the https://en.wikipedia.org/wiki/Unix_time[Unix time] date of modification, `data-identifier` is the data block identifier referenced and signature is the Ed25519 signature of the previous content.
+pointer-content-v1 = timestamp block-identifier-v1 signature
+timestamp = <64 bit unsigned integer, 8 bytes, little-endian>
+signature = <Ed25519 signature of previous content, 64 bytes>
 
-The content (version 1) of a bound pointer object is `<timestamp><data-identifier><bound-identifier><signature>` where `bound-identifier` is the bound data block identifier.
+bound-pointer-content-v1 = timestamp block-identifier-v1 bound-block-identifier-v1 signature
+bound-block-identifier-v1 = block-identifier-v1
+----
 
-The version of the contents is inferred from the version of the identity identifier.
+An identity identifier (version 1) is a sequence of 33 bytes. The `public-key` is the sequence of an https://en.wikipedia.org/wiki/EdDSA[Ed25519] public key bytes.
 
-An unbound pointer is accessed by its identity identifier. A bound pointer is accessed by its identity identifier and its bound data block identifier. A topic is accessed by a data block identifier and results in the aggregation or listing of the associated bound pointers.
+NOTE: The version of the pointer content is inferred from the version of the identity identifier.
+
+The `timestamp` should be set at the https://en.wikipedia.org/wiki/Unix_time[Unix time] date of modification. Newer versions of a pointer should replace the current one if their `timestamp` is strictly greater and not from the future. Because time can vary from a system to another, a _seaport_ may use an error margin for the comparison.
+
+An unbound pointer is accessed by its identity identifier. A bound pointer is accessed by its identity identifier and its bound block identifier. A topic is accessed by a block identifier and results in the discovery of the associated bound pointers.
+
+TIP: A _seaport_ may keep an history of all the updates to a pointer to allow users to access the previously pointed blocks.
 
 == Data structures
 
-A data structure is built on data blocks; generally, this will result in a Merkle DAG of blocks.
+A data structure is built on blocks; generally, this will result in a Merkle DAG of blocks.
 
 === File / Blob
 
@@ -61,15 +97,7 @@ A data structure is built on data blocks; generally, this will result in a Merkl
 
 === Directory
 
-== Access
-
-=== Data block
-
-=== Pointer
-
-=== Alias
-
-=== Directory
+== Uniform Resource Identifier
 
 == Limitations
 
