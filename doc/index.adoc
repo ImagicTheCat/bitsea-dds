@@ -85,7 +85,7 @@ An identity identifier (version 1) is a sequence of 33 bytes. The `public-key` i
 
 NOTE: The version of the pointer content is inferred from the version of the identity identifier.
 
-The `timestamp` should be set at the https://en.wikipedia.org/wiki/Unix_time[Unix time] date of modification. Newer versions of a pointer should replace the current one if their `timestamp` is strictly greater and not from the future. Because time can vary from a system to another, a _seaport_ may use an error margin for the comparison.
+The `timestamp` should be set at the https://en.wikipedia.org/wiki/Unix_time[Unix time] date of modification. Newer versions of a pointer should replace the current one if their `timestamp` is strictly greater and not into the future. Because time can vary from a system to another, a _seaport_ may use an error margin for the latter.
 
 An unbound pointer is accessed by its identity identifier. A bound pointer is accessed by its identity identifier and its bound block identifier. A topic is accessed by a block identifier and results in the discovery of the associated bound pointers.
 
