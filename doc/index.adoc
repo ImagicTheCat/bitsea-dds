@@ -41,7 +41,9 @@ Topic:: A block identifier which may have bound pointers.
 
 Blocks define immutable content, pointers are a layer above to implement mutable content and topics are a way to discover content via bound pointers.
 
-A block may contain anything, e.g. references to other blocks to build a https://en.wikipedia.org/wiki/Merkle_tree[Merkle] DAG (Directed Acyclic Graph).
+A block may contain anything, e.g. references to other blocks to build a Hash DAGfootnote:[Also called a Merkle DAG in reference to Merkle Trees, but may be ambiguous.] (https://en.wikipedia.org/wiki/Directed_acyclic_graph[Directed Acyclic Graph]).
+
+NOTE: In the context of BitSea, a Hash DAG is a directed graph where a node is a data block referenced by the cryptographic hash of its content, which holds the references to its children. By the properties of the cryptographic hashing function, the graph can only be built from the children to the parents and cycles are not possible.
 
 TIP: Complex data structures can be built on blocks and the system defines some. It is possible to create new kind of structures; _seaports_ or other applications may interpret them.
 
@@ -91,7 +93,7 @@ TIP: A _seaport_ may keep an history of all the updates to a pointer to allow us
 
 == Data structures
 
-A data structure is built on blocks; generally, this will result in a Merkle DAG of blocks.
+A data structure is built on blocks; generally, this will result in a Hash DAG of blocks.
 
 === File / Blob
 
