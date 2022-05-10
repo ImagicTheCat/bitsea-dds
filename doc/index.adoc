@@ -64,7 +64,7 @@ content-data = {byte}
 
 A block identifier (version 1) is a sequence of 33 bytes. The content `hash` is computed using https://en.wikipedia.org/wiki/BLAKE_(hash_function)[BLAKE2b-256], i.e. the BLAKE2b algorithm with an output of 32 bytes (256 bits) and default parameters.
 
-A block content start with a `type-header`, a byte sequence between 0 and 255 bytes which defines its data type. An empty `type-header` of `size` 0 is a raw data block. The `type-header` can be used by anyone to build new data structures or formats from blocks.
+A block content start with a `type-header`, a byte sequence between 0 and 255 bytes which defines its data type. An empty `type-header` of `size` 0 describes a raw data block. The `type-header` can be used by anyone to build new data structures or formats from blocks.
 
 === Pointers
 
