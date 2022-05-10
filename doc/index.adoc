@@ -97,7 +97,7 @@ TIP: A _seaport_ may keep an history of all the updates to a pointer to allow us
 
 == Data structures
 
-A data structure is built on blocks; generally, this will result in a Hash DAG of blocks.
+A data structure is built on blocks, generally by forming a Hash DAG, where a root block represents the structured resource.
 
 === File / Blob
 
@@ -107,7 +107,7 @@ A data structure is built on blocks; generally, this will result in a Hash DAG o
 
 == Uniform Resource Identifier
 
-A resource of the system is equivalent to a specific block, which can describe a data structure or may be interpreted as a topic.
+A resource of the system is equivalent to a specific block, which can represent a data structure or may be interpreted as a topic.
 
 A BitSea URI follows the https://datatracker.ietf.org/doc/html/rfc3986[generic URI specification] and uses the `bitsea` scheme.
 
