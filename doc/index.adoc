@@ -87,6 +87,10 @@ NOTE: The version of the pointer content is inferred from the version of the ide
 
 The `timestamp` should be set at the https://en.wikipedia.org/wiki/Unix_time[Unix time] date of modification. Newer versions of a pointer should replace the current one if their `timestamp` is strictly greater and not into the future. Because time can vary from a system to another, a _seaport_ may use an error margin for the latter comparison.
 
+NOTE: By updating if strictly greater, the pointer is stable for a specific `timestamp` once acquired. By rejecting a `timestamp` too far into the future, it is more consistent with the idea of a pointer; it will be impossible to share a forever immutable pointer.
+
+WARNING: The `timestamp` is not a reliable time source about when the pointer has been modified. Its sole purpose is versioning.
+
 An unbound pointer is accessed by its identity identifier. A bound pointer is accessed by its identity identifier and its bound block identifier. A topic is accessed by a block identifier and results in the discovery of the associated bound pointers.
 
 TIP: A _seaport_ may keep an history of all the updates to a pointer to allow users to access the previously pointed blocks.
@@ -151,7 +155,7 @@ This section explores the limitations of the system in the long-term.
 
 === If a weakness is found on the hashing algorithm
 
-=== If a Weakness is found on the asymmetric signature algorithm
+=== If a weakness is found on the asymmetric signature algorithm
 
 == Example applications
 
