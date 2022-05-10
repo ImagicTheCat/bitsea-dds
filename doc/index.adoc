@@ -7,11 +7,11 @@ It can result in a robust, offline, long-term, independent access to structured 
 
 == Principles
 
-The system is fundamentally about data and its semantic; the way data is exchanged is independent of the specification. However, because actual implementations should exist, the system is designed with concerns about how it will be implemented.
+The system is fundamentally about data and its semantic; the way data is exchanged is independent of the specification. However, because actual applications should exist, the system is designed with concerns about how it will be implemented.
 
 The concept is as follows: each _user_ has a _shore_ where its data of interest is stranded; then by the use of a _seaport_ that data can be exchanged with other shores across the sea through _seaways_.
 
-With more technical words, a user is a *node*, the shore is its *storage*, the seaport is the *client application* and the seaways are *exchange protocols*.
+With more technical words, a user can be seen as a *node*, the shore is its *storage*, the seaport is the *client application* and the seaways are *exchange protocols*.
 
 TIP: The way data is exchanged may be implemented in multiple ways, e.g. being part of a P2P mesh network or requesting an HTTP gateway (through https://en.wikipedia.org/wiki/Tor_(network)[Tor] if anonymity is necessary) which would be connected to a mesh network; the data could even be manually imported from physical storage.
 
@@ -25,7 +25,7 @@ TIP: The way data is exchanged may be implemented in multiple ways, e.g. being p
 - Confidentiality. The system is not about storing private data footnote:[But exchange protocols may guarantee that a specific resource, a block, pointer or topic, can only be discovered by knowing its identifier first.].
 - Fast, reactive, very dynamic data, e.g. chatting or live streaming.
 - Temporary or transport-based data, e.g. emails.
-- Replacing the Web. BitSea may be a component of the distributed web, but it doesn't aim to *be* the distributed web.
+- Replacing the Web. BitSea may be a component of the distributed web, but it doesn't aim to be _the_ distributed web.
 
 NOTE: The system specification *must* be backwards compatible.
 
@@ -54,7 +54,7 @@ The accepted size of a block is enforced by the _seaport_ and _seaways_ implemen
 .EBNF-like specification
 ----
 block-identifier-v1 = 0x00 hash
-hash = <blake2s-256 hash of the content, 32 bytes>
+hash = <BLAKE2b-256 hash of the content, 32 bytes>
 
 block-content = type-header content-data
 type-header = size {byte}
@@ -62,7 +62,7 @@ size = <8 bit unsigned integer, 0-255, 1 byte>
 content-data = {byte}
 ----
 
-A block identifier (version 1) is a sequence of 33 bytes. The content `hash` is computed using https://en.wikipedia.org/wiki/BLAKE_(hash_function)[blake2s-256].
+A block identifier (version 1) is a sequence of 33 bytes. The content `hash` is computed using https://en.wikipedia.org/wiki/BLAKE_(hash_function)[BLAKE2b-256], i.e. the BLAKE2b algorithm with an output of 32 bytes (256 bits) and default parameters.
 
 A block content start with a `type-header`, a byte sequence between 0 and 255 bytes which defines its data type. An empty `type-header` of `size` 0 is a raw data block. The `type-header` can be used by anyone to build new data structures or formats from blocks.
 
@@ -147,7 +147,11 @@ The URI fragment can be used to reference an entry of the key-value store.
 
 == Limitations
 
-=== Upgrade of the hash or asymmetric cryptography algorithms
+This section explores the limitations of the system in the long-term.
+
+=== If a weakness is found on the hashing algorithm
+
+=== If a Weakness is found on the asymmetric signature algorithm
 
 == Example applications
 
