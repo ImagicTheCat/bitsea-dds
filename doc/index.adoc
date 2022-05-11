@@ -117,15 +117,21 @@ Each step of the URI path resolves to a resource, i.e. a block.
 ----
 scheme = "bitsea"
 root-segment = block | pointer | bound-pointer | alias
-block = <base128btc encoding of the block identifier>
-identity = <base128btc encoding of the identity identifier>
+block = block-v1
 pointer = identity
-bound-pointer = identity "." block
+bound-pointer = identity "-" block
+identity = identity-v1
+block-v1 = "d" <encoding of the block identifier v1 hash, without prefix>
+identity-v1 = "p" <encoding of the identity identifier v1 hash, without prefix>
 ----
 
-The `base128btc` alphabet is specifically `123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`.
+The human-readable encoding of the binary identifiers is based on `base128btc`. The alphabet is specifically `123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`.
 
-NOTE: The incentives for `base128btc` encoding is human-readability and composition: short strings, less ambiguity, no special characters.
+To encode the bytes, they are interpreted as a base-256 big-endian unsigned integer which is then converted to the corresponding base-58 big-endian unsigned integer without padding.
+
+To decode the base-58 payload, it is interpreted as a base-58 big-endian unsigned integer which is then converted to the corresponding base-256 big-endian unsigned integer, with left padding to fit into the expected number of bytes.
+
+NOTE: The incentives for `base128btc` is human-readability and composition: short strings, less ambiguity, no special characters.
 
 A `pointer` or `bound-pointer` resolves to the pointed resource.
 
@@ -133,10 +139,12 @@ The `alias` is an URI root segment which doesn't match the previously defined ro
 
 NOTE: A _seaport_ can provide pre-defined aliases and should allow the user to define more.
 
+The semantic of non-root segments is defined by the kind and data of the previously resolved block.
+
 .Examples
-block:: `bitsea:1CMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
-pointer:: `bitsea:fJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P/...`
-bound pointer:: `bitsea:fJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P.1CMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
+block:: `bitsea:dCMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
+pointer:: `bitsea:pJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P/...`
+bound pointer:: `bitsea:pJx4T3yQnDbUsNRkTzoH9YJz9hAqSsA9JyFu3PA5f7o4P-dCMn1nKMPqjFA2PxcA2vihGyhTZ9vPjDhGu7hHZVj464H/...`
 alias and directory fetch:: `bitsea:org/wikipedia/...`
 
 === Data structures
